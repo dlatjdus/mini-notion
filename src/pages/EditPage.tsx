@@ -29,20 +29,26 @@ export default function EditPage() {
         if (!Number.isFinite(id)) return;
 
         (async () => {
-            setLoading(true);
-            const res = await apiFetch(`/pages/${id}`);
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                alert('페이지 불러오기 실패: ' + (err.message ?? 'unknown'));
-                setLoading(false);
-                return;
-            }
+            try {
+                setLoading(true);
+                const res = await apiFetch(`/pages/${id}`);
+            
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    alert('페이지 불러오기 실패: ' + (err.message ?? 'unknown'));
+                    setLoading(false);
+                    return;
+                }
 
-            const data = (await res.json()) as {page: PageDetail};
-            setTitle(data.page.title ?? '');
-            setContent(data.page.content ?? '');
-            setUpdatedAt(data.page.updatedAt ?? null);
-            setLoading(false);
+                const data = (await res.json()) as {page: PageDetail};
+                setTitle(data.page.title ?? '');
+                setContent(data.page.content ?? '');
+                setUpdatedAt(data.page.updatedAt ?? null);
+            } catch(e) {
+                console.error(e);
+            } finally {
+                setLoading(false);
+            }
         })();
     }, [id]);
 
